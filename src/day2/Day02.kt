@@ -50,6 +50,11 @@ fun main() {
    println( games.sumOf {
         validateGame(it, 14, 12,13)
     })
+
+
+    println( games.sumOf {
+        findMinGame(it, 14, 12,13)
+    })
 //println(games)
 
 
@@ -67,6 +72,24 @@ fun validateGame(game: Game, blueTarget: Int, redTarget: Int, greenTarget: Int):
         return game.roundNumber
 
     return 0
+}
+
+fun findMinGame(game: Game, blueTarget: Int, redTarget: Int, greenTarget: Int): Int {
+
+    var blue = game.rounds?.maxOf { it -> it.blue }
+    var red = game.rounds?.maxOf { it -> it.red }
+    var green = game.rounds?.maxOf { it -> it.green }
+
+//    println("blue is $blue : green is $green : red is $red")
+
+
+    blue = if (blue!! > 0) blue else 1
+    red = if (red!! > 0) red else 1
+    green = if (green!! > 0) green else 1
+
+    return blue * green * red
+
+
 }
 
 fun generateGameFromLog(it: String): Game {
