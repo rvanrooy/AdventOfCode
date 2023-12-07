@@ -3,15 +3,15 @@ package Day7
 import readInput
 
 
-enum class HandRank {
-    FIVE,
-    FOUR,
-    FULLHOUSE,
-    THREE,
-    TWO,
-    ONE,
-    HIGH
-}
+//enum class HandRank {
+//    FIVE(7),
+//    FOUR(6),
+//    FULLHOUSE(5),
+//    THREE(4),
+//    TWO(3),
+//    ONE(2),
+//    HIGH(1)
+//}
 
 
 class CompareHands {
@@ -20,7 +20,7 @@ class CompareHands {
             'A' -> 14
             'K' -> 13
             'Q' -> 12
-            'J' -> 11
+            'J' -> 1
             'T' -> 10
             else -> c.digitToInt()
 
@@ -59,16 +59,21 @@ data class Hand(val hand: String, val bid: Int, var rank: Int= -1) {
 
     var handClass: Int = 0
     val rankMap: MutableMap<Char, Int?> = mutableMapOf()
-
+    var numJokers: Int = 0
 
 
 
 
     fun numberOf(num: Int):Int {
 
+        if (numJokers == 0) {
+            return rankMap.values.filter { it == num}.size
+        }
 
-        // Find if any value == num
+        // we have jokers, so remove them from the rankMap.
+        rankMap.remove('J')
         return rankMap.values.filter { it == num}.size
+
 
     }
 
@@ -79,40 +84,93 @@ data class Hand(val hand: String, val bid: Int, var rank: Int= -1) {
     }
 
     fun classifyHand(): Int{
+
+        numJokers = hand.count { it == 'J' }
+
+        if (numJokers > 0 ) {
+            println("joker")
+        }
+
+
         if (numberOf(5) == 1) {
             handClass = 7
             rank = 7
             return 7
         }
         else if (numberOf(4) == 1) {
-            handClass = 6
-            rank = 6
-            return 6
+            handClass = 6 + numJokers
+            rank = 6 + numJokers
+            return 6+ numJokers
         }
         else if (numberOf(3) == 1 && numberOf(2) == 1) {
             handClass = 5
-            rank =5
-            return 5
+            rank = 5
+
+            if (numJokers == 2 || numJokers == 3) {
+                handClass = 7
+                rank = 7
+
+            }
+            return handClass
         }
         else if (numberOf(3) == 1) {
             handClass = 4
             rank = 4
-            return 4
+
+            when (numJokers) {
+                1 -> handClass = 6
+                2 -> handClass = 7
+
+            }
+
+
+
+            rank = handClass
+            return handClass
         }
         else if (numberOf(2) == 2) {
             handClass = 3
-            rank =3
-            return 3
+
+            when (numJokers) {
+                1 -> handClass = 5
+                2 -> handClass = 6
+                3-> handClass = 7
+            }
+
+            rank = handClass
+            return handClass
         }
         else if (numberOf(2) == 1) {
             handClass = 2
-            rank  = 2
-            return 2
+
+            when (numJokers) {
+                1 -> handClass = 4
+                2 -> handClass = 6
+                3-> handClass = 7
+            }
+
+            rank = handClass
+            return handClass
+        }
+        else if (numberOf(1) == 0) {
+            //edge case where there are no cards, meaning 5 jokers
+            handClass = 7
+            rank = handClass
+            return handClass
+
         }
         else {
             handClass = 1
-            rank = 1
-            return 1
+
+            when (numJokers) {
+                1 -> handClass = 2
+                2 -> handClass = 4
+                3-> handClass = 6
+                4-> handClass = 7
+            }
+
+            rank = handClass
+            return handClass
         }
     }
 
